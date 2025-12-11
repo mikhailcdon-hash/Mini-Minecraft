@@ -20,89 +20,68 @@ World::World() {
 }
 
 void World::Init() {
-  // 1. Generate Textures (Procedural Iconic Minecraft)
-
-  // GRASS BLOCK (Top) - Vivid Green with noise
-  Image imgGrass = GenImageColor(16, 16, MakeColor(60, 190, 60, 255));
-  for (int i = 0; i < 100; i++)
+  // 1. Generate Textures (Procedural)
+  // GRASS
+  Image imgGrass = GenImageColor(16, 16, GREEN);
+  ImageColorReplace(&imgGrass, GREEN, MakeColor(34, 139, 34, 255));
+  for (int i = 0; i < 64; i++)
     ImageDrawPixel(&imgGrass, rand() % 16, rand() % 16,
-                   MakeColor(80, 220, 80, 255));
+                   MakeColor(50, 205, 50, 255));
   blockTextures[BLOCK_GRASS] = LoadTextureFromImage(imgGrass);
 
-  // GRASS SIDE - Dirt with Grass Top (3px)
-  Image imgGrassSide =
-      GenImageColor(16, 16, MakeColor(130, 90, 50, 255)); // Dirt Brown
-  // Add noise to dirt
-  for (int i = 0; i < 60; i++)
-    ImageDrawPixel(&imgGrassSide, rand() % 16, 3 + rand() % 13,
-                   MakeColor(110, 70, 40, 255));
-  // Grass Fringe
-  ImageDrawRectangle(&imgGrassSide, 0, 0, 16, 3, MakeColor(60, 190, 60, 255));
-  for (int x = 0; x < 16; x++) {
-    if (rand() % 3 != 0)
-      ImageDrawPixel(&imgGrassSide, x, 3, MakeColor(60, 190, 60, 255));
-  }
-
-  // DIRT - Smooth Brown with Noise
-  Image imgDirt = GenImageColor(16, 16, MakeColor(130, 90, 50, 255));
-  for (int i = 0; i < 80; i++)
+  // DIRT
+  Image imgDirt = GenImageColor(16, 16, BROWN);
+  for (int i = 0; i < 64; i++)
     ImageDrawPixel(&imgDirt, rand() % 16, rand() % 16,
-                   MakeColor(110, 70, 40, 255));
+                   MakeColor(100, 50, 20, 255));
   blockTextures[BLOCK_DIRT] = LoadTextureFromImage(imgDirt);
 
-  // STONE - Smooth Grey with random pixels
-  Image imgStone = GenImageColor(16, 16, MakeColor(128, 128, 128, 255));
-  for (int i = 0; i < 80; i++)
+  // STONE
+  Image imgStone = GenImageColor(16, 16, DARKGRAY);
+  for (int i = 0; i < 100; i++)
     ImageDrawPixel(&imgStone, rand() % 16, rand() % 16,
-                   MakeColor(110, 110, 110, 255));
+                   MakeColor(100, 100, 100, 255));
   blockTextures[BLOCK_STONE] = LoadTextureFromImage(imgStone);
 
-  // WOOD SIDE - Dark Vertical Stripes
-  Image imgWood = GenImageColor(16, 16, MakeColor(110, 80, 40, 255)); // Bark
-  for (int x = 2; x < 14; x += 3)
-    ImageDrawLine(&imgWood, x, 0, x, 16, MakeColor(90, 60, 30, 255));
+  // WOOD
+  Image imgWood = GenImageColor(16, 16, MakeColor(139, 69, 19, 255));
+  ImageDrawLine(&imgWood, 4, 0, 4, 16, MakeColor(160, 82, 45, 255));
+  ImageDrawLine(&imgWood, 10, 0, 10, 16, MakeColor(120, 50, 10, 255));
   blockTextures[BLOCK_WOOD] = LoadTextureFromImage(imgWood);
 
-  // WOOD TOP - Rings
-  Image imgWoodTop =
-      GenImageColor(16, 16, MakeColor(180, 140, 80, 255)); // Core
-  // ImageDrawRectangleLines takes (Image*, Rectangle, int thick, Color)
-  ImageDrawRectangleLines(&imgWoodTop, (Rectangle){1, 1, 14, 14}, 1,
-                          MakeColor(140, 100, 60, 255));
-  ImageDrawRectangleLines(&imgWoodTop, (Rectangle){4, 4, 8, 8}, 1,
-                          MakeColor(140, 100, 60, 255));
-
-  // SAND - Yellow with slight noise
-  Image imgSand = GenImageColor(16, 16, MakeColor(240, 240, 160, 255));
-  for (int i = 0; i < 40; i++)
-    ImageDrawPixel(&imgSand, rand() % 16, rand() % 16,
-                   MakeColor(220, 220, 140, 255));
+  // SAND
+  Image imgSand = GenImageColor(16, 16, BEIGE);
+  for (int i = 0; i < 50; i++)
+    ImageDrawPixel(&imgSand, rand() % 16, rand() % 16, GOLD);
   blockTextures[BLOCK_SAND] = LoadTextureFromImage(imgSand);
 
-  // LEAVES - Green with transparent holes (simulated by dark green for now as
-  // we don't have alpha masking setup perfectly on atlas w/o care) Actually,
-  // better to use solid colors for performance on procedural.
-  Image imgLeaves =
-      GenImageColor(16, 16, MakeColor(30, 140, 30, 255)); // Dark Green Base
-  for (int i = 0; i < 60; i++)
+  // LEAVES
+  Image imgLeaves = GenImageColor(16, 16, MakeColor(0, 100, 0, 255));
+  for (int i = 0; i < 40; i++)
     ImageDrawPixel(&imgLeaves, rand() % 16, rand() % 16,
-                   MakeColor(60, 180, 60, 255)); // Lighter leaves
+                   MakeColor(0, 150, 0, 255));
   blockTextures[BLOCK_LEAVES] = LoadTextureFromImage(imgLeaves);
 
   // WATER
-  Image imgWater = GenImageColor(16, 16, MakeColor(0, 50, 200, 200));
+  Image imgWater = GenImageColor(16, 16, BLUE);
+  ImageAlphaClear(&imgWater, MakeColor(0, 0, 255, 150), 0.5f);
+  for (int i = 0; i < 40; i++)
+    ImageDrawPixel(&imgWater, rand() % 16, rand() % 16,
+                   MakeColor(0, 191, 255, 200));
   blockTextures[BLOCK_WATER] = LoadTextureFromImage(imgWater);
 
-  blockTextures[BLOCK_AIR] = blockTextures[BLOCK_DIRT]; // Fallback
+  blockTextures[BLOCK_AIR] = blockTextures[BLOCK_DIRT];
 
   // 2. Build Atlas
-  // 128x128 pixels.
-  // Row 0: Standard Blocks
-  // Row 1: Special Faces (Grass Side, Wood Top)
+  // 128x128 pixels. 8 blocks per row.
   Image atlasImg = GenImageColor(128, 128, BLANK);
 
-  // Helper lambda or macro could be nice, but simple copy is fine
-  // ROW 0
+  // Copy images to atlas
+  // Order must match BlockType enum
+  // 1: DIRT -> 0,0
+  // 2: GRASS -> 16,0
+  // ...
+  // We'll iterate enum 1 to 7
   ImageDraw(&atlasImg, imgDirt, (Rectangle){0, 0, 16, 16},
             (Rectangle){16 * 1, 0, 16, 16}, WHITE);
   ImageDraw(&atlasImg, imgGrass, (Rectangle){0, 0, 16, 16},
@@ -118,24 +97,14 @@ void World::Init() {
   ImageDraw(&atlasImg, imgWater, (Rectangle){0, 0, 16, 16},
             (Rectangle){16 * 7, 0, 16, 16}, WHITE);
 
-  // ROW 1
-  // Grass Side at (2, 1) -> maps to same column as Grass but row 1
-  ImageDraw(&atlasImg, imgGrassSide, (Rectangle){0, 0, 16, 16},
-            (Rectangle){16 * 2, 16, 16, 16}, WHITE);
-  // Wood Top at (4, 1)
-  ImageDraw(&atlasImg, imgWoodTop, (Rectangle){0, 0, 16, 16},
-            (Rectangle){16 * 4, 16, 16, 16}, WHITE);
-
   atlasTexture = LoadTextureFromImage(atlasImg);
   UnloadImage(atlasImg);
 
   // Unload source images
   UnloadImage(imgGrass);
-  UnloadImage(imgGrassSide);
   UnloadImage(imgDirt);
   UnloadImage(imgStone);
   UnloadImage(imgWood);
-  UnloadImage(imgWoodTop);
   UnloadImage(imgSand);
   UnloadImage(imgLeaves);
   UnloadImage(imgWater);
@@ -225,9 +194,8 @@ void World::GenerateTerrain() {
         gradient = 0;
 
       // Lower height multiplier for flatter terrain
-      // +64 offset ensures deep ground (Sea Level at 64)
-      // Height up to ~120-150.
-      int height = (int)(noiseVal * 60.0f * gradient) + 64;
+      // +6 offset ensures land is generally above water level (Y=6)
+      int height = (int)(noiseVal * 15.0f * gradient) + 6;
 
       for (int y = 0; y <= height; y++) {
         BlockType type = BLOCK_DIRT;
@@ -235,14 +203,14 @@ void World::GenerateTerrain() {
           type = BLOCK_GRASS;
         if (y < height - 3)
           type = BLOCK_STONE;
-        if (y == height && y <= 65) // Sand beaches near water level (64)
+        if (y == height && y <= 7) // Sand beaches near water level
           type = BLOCK_SAND;
 
         SetBlock(x, y, z, true, type);
       }
 
-      // Water Level at Y=64
-      for (int y = 0; y <= 64; y++) {
+      // Water Level at Y=6
+      for (int y = 0; y <= 6; y++) {
         if (!grid[x][y][z].active) {
           SetBlock(x, y, z, true, BLOCK_WATER);
         }
@@ -250,7 +218,7 @@ void World::GenerateTerrain() {
 
       // Trees (Only on Grass and not too close to water)
       if (grid[x][height][z].active && grid[x][height][z].type == BLOCK_GRASS &&
-          height > 65 && (rand() % 100) < 1) { // 1% chance
+          height > 7 && (rand() % 100) < 1) { // 1% chance for cleaner look
         GenerateTree(x, height + 1, z);
       }
     }
@@ -279,35 +247,15 @@ void World::GenerateTree(int x, int y, int z) {
   }
 }
 
-// Update with player pos? Actually we only need it for prioritizing chunks.
-// For now, simple round robin is fine or distance check.
-void World::Update(Vector3 playerPos) {
+void World::Update() {
   int rebuildCount = 0;
-
-  // Prioritize chunks near player?
-  // Simple scan
-  int cxStart = (int)playerPos.x / CHUNK_SIZE - 4;
-  int cxEnd = (int)playerPos.x / CHUNK_SIZE + 4;
-  int czStart = (int)playerPos.z / CHUNK_SIZE - 4;
-  int czEnd = (int)playerPos.z / CHUNK_SIZE + 4;
-
-  // Clamp
-  if (cxStart < 0)
-    cxStart = 0;
-  if (cxEnd > WORLD_WIDTH / CHUNK_SIZE)
-    cxEnd = WORLD_WIDTH / CHUNK_SIZE;
-  if (czStart < 0)
-    czStart = 0;
-  if (czEnd > WORLD_WIDTH / CHUNK_SIZE)
-    czEnd = WORLD_WIDTH / CHUNK_SIZE; // Depth same as width logic
-
-  for (int cx = cxStart; cx < cxEnd; cx++) {
-    for (int cz = czStart; cz < czEnd; cz++) {
-      for (int cy = 0; cy < WORLD_HEIGHT / CHUNK_SIZE; cy++) {
+  for (int cx = 0; cx < WORLD_WIDTH / CHUNK_SIZE; cx++) {
+    for (int cy = 0; cy < WORLD_HEIGHT / CHUNK_SIZE; cy++) {
+      for (int cz = 0; cz < WORLD_DEPTH / CHUNK_SIZE; cz++) {
         if (chunks[cx][cy][cz].dirty) {
           RebuildChunk(cx, cy, cz);
           rebuildCount++;
-          if (rebuildCount > 4) // Lower rebuild per frame to keep FPS high
+          if (rebuildCount > 8)
             return;
         }
       }
@@ -359,31 +307,8 @@ void World::RebuildChunk(int cx, int cy, int cz) {
           continue;
 
         BlockType type = grid[x][y][z].type;
-
-        // Default UVs (everything same on all sides)
-        float uTop = (int)type * uvStep;
-        float vTop = 0.0f;
-        float uBottom = uTop;
-        float vBottom = 0.0f;
-        float uSide = uTop;
-        float vSide = 0.0f;
-
-        // Custom Multi-Face Textures
-        if (type == BLOCK_GRASS) {
-          uTop = 2 * uvStep;
-          vTop = 0.0f; // Grass Top
-          uBottom = 1 * uvStep;
-          vBottom = 0.0f; // Dirt Bottom
-          uSide = 2 * uvStep;
-          vSide = uvStep; // Grass Side (Row 1)
-        } else if (type == BLOCK_WOOD) {
-          uTop = 4 * uvStep;
-          vTop = uvStep; // Wood Top (Row 1)
-          uBottom = 4 * uvStep;
-          vBottom = uvStep;
-          uSide = 4 * uvStep;
-          vSide = 0.0f; // Wood Side
-        }
+        float u = (int)type * uvStep;
+        float v = 0.0f;
 
         // Check neighbors
         // TOP (Y+)
@@ -405,15 +330,19 @@ void World::RebuildChunk(int cx, int cy, int cz) {
           for (int k = 0; k < 6; k++)
             normals.push_back((Vector3){0, 1, 0});
 
-          float u = uTop;
-          float v = vTop;
+          texcoords.push_back((Vector2){u, v});
+          texcoords.push_back(
+              (Vector2){u, v + 1.0f}); // Full height? No 16/128 = 0.125
+          // Atlas is 128x128. Textures are 16x16.
+          // V range is 0 to 0.125
+          // U range is u to u+0.125
           float vH = 0.125f;
           float uW = 0.125f;
 
           // Fix UVs to match vertices order
           // TL, BL, BR, TL, BR, TR
-          // texcoords.pop_back(); // These lines were part of a previous fix,
-          // no longer needed texcoords.pop_back(); // Remove placeholder
+          texcoords.pop_back();
+          texcoords.pop_back(); // Remove placeholder
 
           texcoords.push_back((Vector2){u, v});           // TL
           texcoords.push_back((Vector2){u, v + vH});      // BL
@@ -438,8 +367,6 @@ void World::RebuildChunk(int cx, int cy, int cz) {
           for (int k = 0; k < 6; k++)
             normals.push_back((Vector3){0, -1, 0});
 
-          float u = uBottom; // Use Bottom Texture
-          float v = vBottom;
           float vH = 0.125f;
           float uW = 0.125f;
           texcoords.push_back((Vector2){u, v + vH});
@@ -451,186 +378,107 @@ void World::RebuildChunk(int cx, int cy, int cz) {
           texcoords.push_back((Vector2){u + uW, v + vH});
         }
 
-        // FRONT (Z+) - Face Normal (0, 0, 1)
+        // FRONT (Z+)
         if (z == WORLD_DEPTH - 1 || !grid[x][y][z + 1].active ||
             (grid[x][y][z + 1].type == BLOCK_LEAVES && type != BLOCK_LEAVES)) {
-          // CCW winding: BL -> TR -> TL
-          vertices.push_back((Vector3){(float)x, (float)y, (float)z + 1}); // BL
+          vertices.push_back((Vector3){(float)x, (float)y, (float)z + 1});
+          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z + 1});
           vertices.push_back(
-              (Vector3){(float)x + 1, (float)y + 1, (float)z + 1}); // TR
-          vertices.push_back(
-              (Vector3){(float)x, (float)y + 1, (float)z + 1}); // TL
+              (Vector3){(float)x + 1, (float)y + 1, (float)z + 1});
 
-          // CCW winding: BL -> BR -> TR
-          vertices.push_back((Vector3){(float)x, (float)y, (float)z + 1}); // BL
+          vertices.push_back((Vector3){(float)x, (float)y, (float)z + 1});
           vertices.push_back(
-              (Vector3){(float)x + 1, (float)y, (float)z + 1}); // BR
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y + 1, (float)z + 1}); // TR
+              (Vector3){(float)x + 1, (float)y + 1, (float)z + 1});
+          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z + 1});
 
           for (int k = 0; k < 6; k++)
             normals.push_back((Vector3){0, 0, 1});
 
-          float u = uSide; // Side Texture
-          float v = vSide;
           float vH = 0.125f;
           float uW = 0.125f;
-          // UVs must match vertex order:
-          // BL(u, v+vH), TR(u+uW, v), TL(u, v)
           texcoords.push_back((Vector2){u, v + vH});
-          texcoords.push_back((Vector2){u + uW, v});
           texcoords.push_back((Vector2){u, v});
-
-          // BL(u, v+vH), BR(u+uW, v+vH), TR(u+uW, v)
-          texcoords.push_back((Vector2){u, v + vH});
-          texcoords.push_back((Vector2){u + uW, v + vH});
           texcoords.push_back((Vector2){u + uW, v});
+
+          texcoords.push_back((Vector2){u, v + vH});
+          texcoords.push_back((Vector2){u + uW, v});
+          texcoords.push_back((Vector2){u + uW, v + vH});
         }
 
-        // BACK (Z-) - Face Normal (0, 0, -1)
+        // BACK (Z-)
         if (z == 0 || !grid[x][y][z - 1].active ||
             (grid[x][y][z - 1].type == BLOCK_LEAVES && type != BLOCK_LEAVES)) {
-          // CCW: BR -> BL -> TL (Viewed from back, x+ is Left)
-          // Vertices at Z:
-          // BR (x, y, z)
-          // BL (x+1, y, z)
-          // TL (x+1, y+1, z)
-          // TR (x, y+1, z)
-          // Code uses:
-          // Triangle 1: BL(x+1,y) -> TL(x+1,y+1) -> TR(x,y+1) was giving CW
-          // Need CCW from Z- view. Z- points to us.
-          // X goes Right -> Left on screen.
-          // (x+1, y, z) -> (x, y+1, z) -> (x+1, y+1, z)
-          // Vector 1: (-1, 1). Vector 2: (0, 1). Cross (-1,1,0)x(0,1,0) =
-          // k(-1). (0,0,-1). Correct.
+          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z});
+          vertices.push_back((Vector3){(float)x + 1, (float)y + 1, (float)z});
+          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z});
 
-          vertices.push_back((Vector3){(float)x + 1, (float)y,
-                                       (float)z}); // BL (relative to camera)
-          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z}); // TR
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y + 1, (float)z}); // TL
-
-          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z}); // BL
-          vertices.push_back((Vector3){(float)x, (float)y, (float)z});     // BR
-          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z}); // TR
+          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z});
+          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z});
+          vertices.push_back((Vector3){(float)x, (float)y, (float)z});
 
           for (int k = 0; k < 6; k++)
             normals.push_back((Vector3){0, 0, -1});
 
-          float u = uSide; // Side Texture
-          float v = vSide;
           float vH = 0.125f;
           float uW = 0.125f;
-          // Map UVs to match vertices
-          // (x+1, y)   is u+uW, v+vH
-          // (x, y+1)   is u, v
-          // (x+1, y+1) is u+uW, v
           texcoords.push_back((Vector2){u + uW, v + vH});
-          texcoords.push_back((Vector2){u, v});
           texcoords.push_back((Vector2){u + uW, v});
-
-          // (x+1, y) is u+uW, v+vH
-          // (x, y)   is u, v+vH
-          // (x, y+1) is u, v
-          texcoords.push_back((Vector2){u + uW, v + vH});
-          texcoords.push_back((Vector2){u, v + vH});
           texcoords.push_back((Vector2){u, v});
+
+          texcoords.push_back((Vector2){u + uW, v + vH});
+          texcoords.push_back((Vector2){u, v});
+          texcoords.push_back((Vector2){u, v + vH});
         }
 
-        // LEFT (X-) - Face Normal (-1, 0, 0)
+        // LEFT (X-)
         if (x == 0 || !grid[x - 1][y][z].active ||
             (grid[x - 1][y][z].type == BLOCK_LEAVES && type != BLOCK_LEAVES)) {
-          // Looking from -X. positive Z is Right.
-          // Vertices at x:
-          // BL(z, y) -> (z, y+1) -> (z+1, y+1) was giving CW.
-          // Need CCW.
-          // (z, y) -> (z+1, y+1) -> (z, y+1)
-          // Vector 1: (1, 1). Vector 2: (0, 1). Cross (1,1,0)x(0,1,0) = k(1) =
-          // (1, 0, 0). Wait, we need (-1,0,0). So we want result to coincide
-          // with -X. Actually, in 3D: (0, dy1, dz1) x (0, dy2, dz2). BL->TR:
-          // (0, 1, 1). BL->TL: (0, 1, 0). | i j k | | 0 1 1 | | 0 1 0 | i( -1 )
-          // - ... = (-1, 0, 0). So (z,y)->(z+1,y+1)->(z,y+1) gives (-1, 0, 0).
-          // This is CORRECT.
+          vertices.push_back((Vector3){(float)x, (float)y, (float)z});
+          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z});
+          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z + 1});
 
-          vertices.push_back((Vector3){(float)x, (float)y, (float)z}); // BL
-          vertices.push_back(
-              (Vector3){(float)x, (float)y + 1, (float)z + 1});            // TR
-          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z}); // TL
-
-          vertices.push_back((Vector3){(float)x, (float)y, (float)z});     // BL
-          vertices.push_back((Vector3){(float)x, (float)y, (float)z + 1}); // BR
-          vertices.push_back(
-              (Vector3){(float)x, (float)y + 1, (float)z + 1}); // TR
+          vertices.push_back((Vector3){(float)x, (float)y, (float)z});
+          vertices.push_back((Vector3){(float)x, (float)y + 1, (float)z + 1});
+          vertices.push_back((Vector3){(float)x, (float)y, (float)z + 1});
 
           for (int k = 0; k < 6; k++)
             normals.push_back((Vector3){-1, 0, 0});
 
-          float u = uSide; // Side Texture
-          float v = vSide;
           float vH = 0.125f;
           float uW = 0.125f;
-          // UV:
-          // BL(x, y, z) -> u, v+vH
-          // TR(x, y+1, z+1) -> u+uW, v
-          // TL(x, y+1, z) -> u, v
           texcoords.push_back((Vector2){u, v + vH});
-          texcoords.push_back((Vector2){u + uW, v});
           texcoords.push_back((Vector2){u, v});
-
-          // BL -> u, v+vH
-          // BR(x, y, z+1) -> u+uW, v+vH
-          // TR -> u+uW, v
-          texcoords.push_back((Vector2){u, v + vH});
-          texcoords.push_back((Vector2){u + uW, v + vH});
           texcoords.push_back((Vector2){u + uW, v});
+
+          texcoords.push_back((Vector2){u, v + vH});
+          texcoords.push_back((Vector2){u + uW, v});
+          texcoords.push_back((Vector2){u + uW, v + vH});
         }
 
-        // RIGHT (X+) - Face Normal (1, 0, 0)
+        // RIGHT (X+)
         if (x == WORLD_WIDTH - 1 || !grid[x + 1][y][z].active ||
             (grid[x + 1][y][z].type == BLOCK_LEAVES && type != BLOCK_LEAVES)) {
-          // Previously CW.
-          // Need (1, 0, 0).
-          // Vertices at x+1:
-          // BL(z+1, y), TL(z+1, y+1), TR(z, y+1), BR(z, y)
-          // (z+1, y) -> (z, y+1) -> (z+1, y+1)
-          // V1: (-1, 1). V2: (0, 1).
-          // | i j k |
-          // | 0 1 -1| (z,y) order? No.
-          // P0(z+1, y). P1(z, y+1). P2(z+1, y+1).
-          // P1-P0 = (0, 1, -1).
-          // P2-P0 = (0, 1, 0).
-          // | i j k |
-          // | 0 1 -1|
-          // | 0 1 0 |
-          // i (1) ... = (1, 0, 0). CORRECT.
+          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z + 1});
+          vertices.push_back(
+              (Vector3){(float)x + 1, (float)y + 1, (float)z + 1});
+          vertices.push_back((Vector3){(float)x + 1, (float)y + 1, (float)z});
 
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y, (float)z + 1}); // BL
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y + 1, (float)z}); // TR
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y + 1, (float)z + 1}); // TL
-
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y, (float)z + 1});            // BL
-          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z}); // BR
-          vertices.push_back(
-              (Vector3){(float)x + 1, (float)y + 1, (float)z}); // TR
+          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z + 1});
+          vertices.push_back((Vector3){(float)x + 1, (float)y + 1, (float)z});
+          vertices.push_back((Vector3){(float)x + 1, (float)y, (float)z});
 
           for (int k = 0; k < 6; k++)
             normals.push_back((Vector3){1, 0, 0});
 
-          float u = uSide;
-          float v = vSide;
           float vH = 0.125f;
           float uW = 0.125f;
-          texcoords.push_back((Vector2){u + uW, v + vH});
+          texcoords.push_back((Vector2){u, v + vH});
           texcoords.push_back((Vector2){u, v});
           texcoords.push_back((Vector2){u + uW, v});
 
-          texcoords.push_back((Vector2){u + uW, v + vH});
           texcoords.push_back((Vector2){u, v + vH});
-          texcoords.push_back((Vector2){u, v});
+          texcoords.push_back((Vector2){u + uW, v});
+          texcoords.push_back((Vector2){u + uW, v + vH});
         }
       }
     }
@@ -672,40 +520,10 @@ void World::RebuildChunk(int cx, int cy, int cz) {
   chunk.active = true;
 }
 
-void World::Draw(Vector3 playerPos) {
-  int renderDist = 4; // 8 chunks radius = 8*16 = 128 blocks
-  // Increase render dist for 1024 map to see more?
-  // Let's try 8 chunks.
-
-  int pcx = (int)playerPos.x / CHUNK_SIZE;
-  int pcy = (int)playerPos.y / CHUNK_SIZE;
-  int pcz = (int)playerPos.z / CHUNK_SIZE;
-
-  int minCX = pcx - renderDist;
-  int maxCX = pcx + renderDist;
-  int minCY = pcy - renderDist;
-  int maxCY = pcy + renderDist;
-  int minCZ = pcz - renderDist;
-  int maxCZ = pcz + renderDist;
-
-  // Clamp
-  if (minCX < 0)
-    minCX = 0;
-  if (maxCX >= WORLD_WIDTH / CHUNK_SIZE)
-    maxCX = WORLD_WIDTH / CHUNK_SIZE;
-  if (minCY < 0)
-    minCY = 0;
-  if (maxCY >= WORLD_HEIGHT / CHUNK_SIZE)
-    maxCY = WORLD_HEIGHT / CHUNK_SIZE;
-  if (minCZ < 0)
-    minCZ = 0;
-  if (maxCZ >= WORLD_DEPTH / CHUNK_SIZE)
-    maxCZ = WORLD_DEPTH / CHUNK_SIZE;
-
-  for (int cx = minCX; cx < maxCX; cx++) {
-    for (int cy = minCY; cy < maxCY;
-         cy++) { // Draw all height? Or cull? Cull height too.
-      for (int cz = minCZ; cz < maxCZ; cz++) {
+void World::Draw() {
+  for (int cx = 0; cx < WORLD_WIDTH / CHUNK_SIZE; cx++) {
+    for (int cy = 0; cy < WORLD_HEIGHT / CHUNK_SIZE; cy++) {
+      for (int cz = 0; cz < WORLD_DEPTH / CHUNK_SIZE; cz++) {
         if (chunks[cx][cy][cz].active) {
           DrawModel(chunks[cx][cy][cz].model, (Vector3){0, 0, 0}, 1.0f, WHITE);
         }

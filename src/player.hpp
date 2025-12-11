@@ -13,6 +13,10 @@ public:
   Camera3D GetCamera() { return camera; }
   Vector3 GetPosition() { return camera.position; }
 
+  Camera3D GetRenderCamera();
+
+  void Respawn(); // Resets player position
+
   // Inventory
   struct InventorySlot {
     BlockType type;
@@ -25,6 +29,15 @@ public:
   void AddItem(BlockType type, int count = 1);
   bool ConsumeItem(); // Returns true if item was consumed (count > 0)
   BlockType GetSelectedBlockType();
+
+  bool isFlying;
+
+  // Animation State
+  float walkTime;
+  float swingTimer;
+  void TriggerSwing();
+  float GetWalkBobbing(); // Returns Y offset
+  float GetHandBobbing(); // Returns random/sine offset for hand
 
 private:
   Camera3D camera;
